@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response("acesso não autorizado",
+    Response::HTTP_UNAUTHORIZED);
 });
+
