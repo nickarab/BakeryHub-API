@@ -1,61 +1,200 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BakeTrack API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Uma API RESTful para gestão de padarias desenvolvida com Laravel, focando em autenticação robusta e gerenciamento de produtos.
 
-## About Laravel
+## Requisitos
+- PHP 8.1+
+- Composer
+- NPM
+- MySQL/MariaDB
+- Laravel 10.x
+- Postman (para testes)
+- Conta no Mailtrap (para testes de email)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Instalação
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```bash
+# Clone o repositório
+git clone https://github.com/nickarab/baketrack-api.git
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Entre na pasta do projeto
+cd baketrack-api
 
-## Learning Laravel
+# Instale as dependências
+composer install
+npm install
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Configure o ambiente
+cp .env.example .env
+php artisan key:generate
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Configure o banco de dados e email no arquivo .env
+# Execute as migrações
+php artisan migrate
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Inicie o servidor
+php artisan serve
+```
 
-## Laravel Sponsors
+## Configuração do Email
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Credenciais do Mailtrap
+Configure seu arquivo `.env` com:
+```dotenv
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=2b1922562003bb
+MAIL_PASSWORD=828f03ff1460da
+MAIL_FROM_ADDRESS="no-reply@yourapp.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
 
-### Premium Partners
+### 2. Verificação de Email
+Após registrar um usuário:
+- O sistema envia automaticamente um email de verificação
+- Acesse [mailtrap.io](https://mailtrap.io) e verifique sua inbox
+- Clique no link de verificação recebido
+- O email será marcado como verificado no sistema
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+## Endpoints e Como Testar (Postman)
 
-## Contributing
+### 1. Registro de Usuário
+```
+POST http://localhost:8000/api/register
+Content-Type: application/json
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+{
+    "name": "Usuario Teste",
+    "email": "usuario@teste.com",
+    "password": "senha123",
+    "password_confirmation": "senha123"
+}
+```
 
-## Code of Conduct
+**Resposta Esperada**:
+```json
+{
+    "success": true,
+    "message": "User registered successfully",
+    "status": 201
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Login
+```
+POST http://localhost:8000/api/login
+Content-Type: application/json
 
-## Security Vulnerabilities
+{
+    "email": "usuario@teste.com",
+    "password": "senha123"
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Resposta Esperada**:
+```json
+{
+    "success": true,
+    "message": "Login successful",
+    "status": 200,
+    "token": "seu_token_aqui"
+}
+```
 
-## License
+### 3. Logout
+```
+POST http://localhost:8000/api/logout
+Authorization: Bearer {token}
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Resposta Esperada**:
+```json
+{
+    "success": true,
+    "message": "Logout successfully",
+    "status": 200
+}
+```
+
+### 4. Reenvio de Email de Verificação
+```
+POST http://localhost:8000/api/email/verification-notification
+Content-Type: application/json
+
+{
+    "email": "usuario@teste.com"
+}
+```
+
+**Resposta Esperada**:
+```json
+{
+    "success": true,
+    "message": "Email verification has been sent",
+    "status": 200
+}
+```
+
+## Como Testar no Postman
+
+1. **Configuração Inicial**
+   - Crie uma nova coleção no Postman chamada "BakeTrack API"
+   - Configure uma variável de ambiente chamada `base_url` com valor `http://localhost:8000/api`
+   - Configure uma variável `token` para armazenar o token de autenticação
+
+2. **Fluxo de Testes**
+   - Registre um novo usuário
+   - Faça login e salve o token retornado na variável de ambiente
+   - Use o token nas requisições autenticadas
+   - Teste o logout
+   - Teste o reenvio de verificação de email
+
+3. **Headers Comuns**
+   ```
+   Content-Type: application/json
+   Accept: application/json
+   Authorization: Bearer {{token}} (para rotas autenticadas)
+   ```
+
+## Códigos de Status
+- 200: OK
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 404: Not Found
+- 500: Internal Server Error
+
+## Possíveis Erros
+
+1. **Registro**
+   - Email já existe
+   - Senhas não conferem
+   - Campos obrigatórios faltando
+
+2. **Login**
+   - Credenciais inválidas
+   - Email não verificado
+
+3. **Verificação de Email**
+   - Email não encontrado
+   - Email já verificado
+
+## Logs e Debug
+- Logs disponíveis em `storage/logs/laravel.log`
+- Use o Postman Console para debug das requisições
+- Verifique o Laravel Log para erros do servidor
+
+## Testes Automatizados
+```bash
+# Executar testes
+php artisan test
+
+# Executar testes com cobertura
+php artisan test --coverage
+```
+
+---
+Desenvolvido por Manoel Barbosa
