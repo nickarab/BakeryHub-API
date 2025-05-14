@@ -1,4 +1,4 @@
-# BakeTrack API
+# BakeryHub-API
 
 Uma API RESTful para gestão de padarias desenvolvida com Laravel, focando em autenticação robusta e gerenciamento de produtos.
 
