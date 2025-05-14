@@ -141,7 +141,7 @@ Content-Type: application/json
 ## Como Testar no Postman
 
 1. **Configuração Inicial**
-   - Crie uma nova coleção no Postman chamada "BakeTrack API"
+   - Crie uma nova coleção no Postman chamada "BakeryHub API"
    - Configure uma variável de ambiente chamada `base_url` com valor `http://localhost:8000/api`
    - Configure uma variável `token` para armazenar o token de autenticação
 
