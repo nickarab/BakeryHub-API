@@ -3,29 +3,42 @@
 namespace App\Http\Services;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserService
 {
     public function __construct(protected User $user)
     {}
 
-    public function storeUser(array $data): void
+    public function showUser(string $id): array
     {
-        $userData = [
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password'])
-        ];
-        $this->user->create($userData);
+        try {
+            $user = $this->user->find($id);
+
+            if (!$user) {
+                return [
+                    'message' => 'User not found',
+                    'data' => null,
+                    'status' => Response::HTTP_NOT_FOUND
+                ];
+            }
+
+            return [
+                'message' => 'User found successfully',
+                'data' => $user,
+                'status' => Response::HTTP_OK
+            ];
+        } catch (Exception $e) {
+            return [
+                'message' => 'Error retrieving user: ' . $e->getMessage(),
+                'data' => null,
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ];
+        }
     }
 
-    public function showUser(string $id): ?User
-    {
-        return $this->user->find($id);
-    }
-
-    public function updateUser(string $id, array $data): ?User
+    public function updateUser(string $id, array $data): array
     {
         if (!empty($data['password'])) {
             $data['password'] = bcrypt($data['password']);
@@ -34,17 +47,55 @@ class UserService
         }
 
         try {
-            $user = $this->user->findOrFail($id);
+            $user = $this->user->find($id);
+
+            if (!$user) {
+                return [
+                    'message' => 'User not found',
+                    'data' => null,
+                    'status' => Response::HTTP_NOT_FOUND
+                ];
+            }
+
             $user->update($data);
-            return $user;
-        } catch (ModelNotFoundException) {
-            return null;
+
+            return [
+                'message' => 'User updated successfully',
+                'data' => $user,
+                'status' => Response::HTTP_OK
+            ];
+        } catch (Exception $e) {
+            return [
+                'message' => 'Error updating user: ' . $e->getMessage(),
+                'data' => null,
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ];
         }
     }
 
-    public function destroyUser(string $id): void
+    public function destroyUser(string $id): array
     {
-        $user = $this->user->findOrFail($id);
-        $user->delete();
+        try {
+            $user = $this->user->find($id);
+
+            if (!$user) {
+                return [
+                    'message' => 'User not found',
+                    'status' => Response::HTTP_NOT_FOUND
+                ];
+            }
+
+            $user->delete();
+
+            return [
+                'message' => 'User deleted successfully',
+                'status' => Response::HTTP_OK
+            ];
+        } catch (Exception $e) {
+            return [
+                'message' => 'Error deleting user: ' . $e->getMessage(),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+            ];
+        }
     }
 }

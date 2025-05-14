@@ -89,4 +89,13 @@ class AuthController
             'message' => $result['message']
         ], $result['status']);
     }
+
+    public function logout(Request $request):JsonResponse
+    {
+        $user = $this->authService->logoutUser($request->user());
+
+        return response()->json([
+            'message' => $user['message']
+        ], $user['status']);
+    }
 }

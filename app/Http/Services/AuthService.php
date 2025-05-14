@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,7 +75,7 @@ class AuthService
                 'message' => 'E-mail verificado com sucesso',
                 'status' => Response::HTTP_OK
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed verifying E-mail:' . $e->getMessage());
             return [
                 'success' => false,
@@ -111,13 +112,33 @@ class AuthService
                 'message' => 'Email verification has been sent',
                 'status' => 200
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed verifying E-mail:' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Error sending verification email',
                 'status' => 500
             ];
+        }
+    }
+
+    public function logoutUser(User $user): array {
+        try{
+            $user->tokens()->delete();
+
+            return
+                [
+                'sucess' => true,
+                'message' => 'logout succesfully',
+                'status' => Response::HTTP_OK
+                ];
+        }catch (Exception $e){
+            return
+                [
+                'sucess' => false,
+                'message' => 'Error during logout' . $e->getMessage(),
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR
+                ];
         }
     }
 }
