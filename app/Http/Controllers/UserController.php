@@ -14,30 +14,6 @@ class UserController
     public function __construct(protected UserService $userService)
     {}
 
-    public function index()
-    {}
-
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8'
-        ]);
-
-        try {
-            $this->userService->storeUser($validated);
-
-            return response()->json([
-                'message' => 'User created successfully'
-            ], Response::HTTP_CREATED);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Error creating user',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 
     public function show(string $id): JsonResponse
     {
