@@ -145,6 +145,4 @@ php artisan test
 php artisan test --coverage
 ```
 
----
 Desenvolvido por Manoel Barbosa
-```
